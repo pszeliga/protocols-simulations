@@ -2,8 +2,8 @@ package ps.protocols.paxos
 
 object Parameters {
 
-  val numberOfPeers = 7
+  val numberOfPeers: Int = 7
 
-  val majorityReached = numberOfPeers / 2
+  val majorityReached: Int = (numberOfPeers / 2) + 1
 
 }

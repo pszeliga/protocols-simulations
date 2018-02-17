@@ -8,7 +8,7 @@ object PaxosProtocol {
 
   case class Suggestion(suggestionId: SuggestionId, value: Integer)
 
-  case class Accepted(suggestionId: SuggestionId)
+  case class Accepted(suggestionId: SuggestionId, value: Integer)
 
   case class NegativeAcknowledgment(suggestionId: SuggestionId)
 
@@ -21,6 +21,15 @@ object PaxosProtocol {
     override def compareTo(other: SuggestionId): Int = {
       val timeCompare = timestamp.compareTo(other.timestamp)
       if (timeCompare == 0) peerId.compareTo(other.peerId) else timeCompare
+    }
+
+    override def hashCode(): Int = timestamp.hashCode() * 13 + peerId.hashCode()
+
+    override def equals(obj: scala.Any): Boolean = {
+      obj match {
+        case other: SuggestionId => other.timestamp == timestamp && other.peerId == peerId
+        case _ => false
+      }
     }
   }
 
