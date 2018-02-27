@@ -10,6 +10,4 @@ class PeerState(
 
   def withLastPromisedSuggestionId(suggestionId: SuggestionId) =
     new PeerState(peerId, value, lastAcceptedSuggestionId, suggestionId)
-
-
 }

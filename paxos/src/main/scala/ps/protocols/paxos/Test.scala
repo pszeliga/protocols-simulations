@@ -4,27 +4,34 @@ import java.util.concurrent.atomic.AtomicReference
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import ps.protocols.paxos.PaxosProtocol.{PeerRequest, Suggestion, SuggestionId}
+import ps.protocols.paxos.roles.{Arbiter, Suggester, Voter}
+import akka.pattern.ask
 
+import scala.concurrent.duration._
+import akka.util.Timeout
+
+import scala.concurrent.Await
 import scala.util.Random
 
 class Network(val peers: IndexedSeq[(Int, (ActorRef, ActorRef))]) extends Actor {
 
-  val random = new Random()
+  private implicit val timeout = Timeout(5 seconds)
+  private val random = new Random()
 
   def receive = {
-
-    case m: String => {
+    case newValue: Int => {
       val randomPeer = random.nextInt(Parameters.numberOfPeers - 1)
-      val randomValue = random.nextInt()
-      peers(randomPeer)._2._2 ! PeerRequest(randomValue)
-    }//peers.foreach(peer => peer._2 ! Suggestion(new SuggestionId(1234L, 'a'), 35))
-
-
-    case any: Any => println(s"Network got: $any")
+      val response = peers(randomPeer)._2._2 ? PeerRequest(newValue)
+      Await.result(response, 5 second)
+    }
+    case any: Any => println(s"Cluster got got: $any")
   }
 }
 
 object Main extends App {
+
+  private val random = new Random()
+
   val system = ActorSystem("Paxos")
   val peers: IndexedSeq[(Int, (ActorRef, ActorRef))] = (1 to Parameters.numberOfPeers)
     .map(id => {
@@ -34,13 +41,12 @@ object Main extends App {
         system.actorOf(Props(classOf[Voter], id, initialState), s"voter-${id.toString}"),
         system.actorOf(Props(classOf[Suggester], id, initialState), s"suggester-${id.toString}")))
     })
-  val network = system.actorOf(Props(new Network(peers)))
+  val cluster = system.actorOf(Props(new Network(peers)))
   val arbiter = system.actorOf(Props(classOf[Arbiter]), "arbiter")
 
   for (_ <- 1 to 100) {
-
-    network ! "new request"
-
+    val randomValue = random.nextInt()
+    cluster ! randomValue
   }
 
   Thread.sleep(10000)
