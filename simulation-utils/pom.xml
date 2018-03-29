@@ -10,13 +10,6 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>two-phase-commit</artifactId>
-
-    <dependencies>
-        <dependency>
-            <groupId>ps.protocols</groupId>
-            <artifactId>simulation-utils</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
+    <artifactId>simulation-utils</artifactId>
+    
 </project>

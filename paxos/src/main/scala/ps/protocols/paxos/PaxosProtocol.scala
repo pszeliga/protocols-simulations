@@ -12,8 +12,6 @@ object PaxosProtocol {
 
   case class NegativeAcknowledgment(suggestionId: SuggestionId)
 
-  case class PeerRequest(value: Integer)
-
   case class SuggestionId(timestamp: Long, peerId: Int) extends Comparable[SuggestionId] {
 
     def this(peerId: Int) = this(0L, peerId)
@@ -33,6 +31,6 @@ object PaxosProtocol {
     }
   }
 
-
+  case class PeerRequest(value: Integer)
 
 }
